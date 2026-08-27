@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Mi día · TaskFlow{% endblock %}
+
+{% block content %}
+<div class="page dashboard-page">
+    <section class="hero">
+        <div>
+            <span class="eyebrow"><span class="pulse-dot"></span> Tu espacio de enfoque</span>
+            <h1>Haz que hoy<br><em>cuente.</em></h1>
+            <p>Organiza lo importante, enfócate en una cosa a la vez y disfruta el progreso.</p>
+        </div>
+        <div class="hero-orbit" aria-hidden="true">
+            <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+            <div class="orbit-center"><span>{{ tareas|length }}</span><small>por hacer</small></div>
+            <span class="orbit-star star-one">✦</span><span class="orbit-star star-two">✦</span>
+        </div>
+    </section>
+
+    <section class="metrics" aria-label="Resumen">
+        <article class="metric-card accent-lime">
+            <span class="metric-icon">↗</span>
+            <div><strong>{{ tareas|length }}</strong><span>Pendientes</span></div>
+            <small>Tu siguiente paso</small>
+        </article>
+        <article class="metric-card accent-violet">
+            <span class="metric-icon">✓</span>
+            <div><strong>{{ completadas|length }}</strong><span>Completadas</span></div>
+            <small>Todo progreso suma</small>
+        </article>
+        <article class="metric-card accent-coral">
+            <span class="metric-icon">◆</span>
+            <div><strong>{{ proyectos|length }}</strong><span>Proyectos</span></div>
+            <small>Frentes activos</small>
+        </article>
+    </section>
+
+    <section class="task-section" id="tareas">
+        <div class="section-heading">
+            <div><span class="section-kicker">En movimiento</span><h2>Tareas pendientes</h2></div>
+            <div class="filter-group" role="group" aria-label="Filtrar por prioridad">
+                <button class="filter-chip active" data-filter="all">Todas <span>{{ tareas|length }}</span></button>
+                <button class="filter-chip" data-filter="Alta">Alta</button>
+                <button class="filter-chip" data-filter="Media">Media</button>
+                <button class="filter-chip" data-filter="Baja">Baja</button>
+            </div>
+        </div>
+
+        <div class="task-grid" id="taskGrid">
+            {% for tarea in tareas %}
+                {% set t = tarea.to_dict() %}
+                {% set project = proyectos|selectattr('id', 'equalto', t.proyecto_id)|first %}
+                <article class="task-card" data-priority="{{ t.prioridad }}" data-search="{{ (t.titulo ~ ' ' ~ t.descripcion)|lower }}">
+                    <div class="task-card-top">
+                        <span class="priority priority-{{ t.prioridad|lower }}"><i></i>{{ t.prioridad }}</span>
+                        <button class="more-button" aria-label="Más opciones">•••</button>
+                    </div>
+                    <div class="task-body">
+                        <h3>{{ t.titulo }}</h3>
+                        <p>{{ t.descripcion or 'Sin descripción. Da el primer paso y deja que el resto fluya.' }}</p>
+                    </div>
+                    <div class="task-meta">
+                        <span class="project-tag"><i></i>{{ project.to_dict().nombre if project else 'General' }}</span>
+                        <span class="date-tag {{ 'no-date' if not t.fecha_limite }}">◷ {{ t.fecha_limite or 'Sin fecha' }}</span>
+                    </div>
+                    <form action="{{ url_for('completar_tarea_web', tarea_id=t.id) }}" method="post">
+                        <button class="complete-button" type="submit"><span class="check-circle">✓</span> Marcar como terminada</button>
+                    </form>
+                </article>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-illustration"><span>✓</span></div>
+                    <span class="eyebrow">Todo en orden</span>
+                    <h3>No tienes tareas pendientes</h3>
+                    <p>Tu lista está despejada. Crea una tarea cuando aparezca tu próximo gran objetivo.</p>
+                    <a class="button button-primary" href="{{ url_for('crear_tarea_web') }}">＋ Crear mi primera tarea</a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="no-results" id="noResults" hidden>No encontramos tareas con ese filtro.</div>
+    </section>
+</div>
+{% endblock %}

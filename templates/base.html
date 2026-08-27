@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#11120f">
+    <title>{% block title %}TaskFlow{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar">
+            <a class="brand" href="{{ url_for('index') }}" aria-label="TaskFlow, inicio">
+                <span class="brand-mark"><span></span><span></span><span></span></span>
+                <span>TaskFlow</span>
+            </a>
+
+            <nav class="main-nav" aria-label="Navegación principal">
+                <p class="nav-label">Espacio de trabajo</p>
+                <a class="nav-link {{ 'active' if request.endpoint == 'index' }}" href="{{ url_for('index') }}">
+                    <span class="nav-icon">⌂</span> Mi día
+                </a>
+                <a class="nav-link {{ 'active' if request.endpoint == 'crear_tarea_web' }}" href="{{ url_for('crear_tarea_web') }}">
+                    <span class="nav-icon">＋</span> Nueva tarea
+                </a>
+                <p class="nav-label nav-label-spaced">Proyectos</p>
+                {% for proyecto in proyectos %}
+                    <a class="nav-link project-link" href="{{ url_for('index') }}#tareas">
+                        <span class="project-dot dot-{{ loop.index0 % 4 }}"></span>
+                        {{ proyecto.to_dict().nombre }}
+                    </a>
+                {% else %}
+                    <span class="nav-empty">Aún no hay proyectos</span>
+                {% endfor %}
+            </nav>
+
+            <div class="sidebar-card">
+                <span class="spark">✦</span>
+                <strong>Avanza a tu ritmo</strong>
+                <p>Divide tus objetivos en pequeñas victorias.</p>
+            </div>
+            <div class="profile-mini">
+                <div class="avatar">TF</div>
+                <div><strong>Mi espacio</strong><span>Productividad personal</span></div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <button class="icon-button menu-button" id="menuButton" aria-label="Abrir menú" aria-expanded="false">☰</button>
+                <div class="search-wrap">
+                    <span>⌕</span>
+                    <input id="globalSearch" type="search" placeholder="Buscar una tarea..." autocomplete="off" aria-label="Buscar tareas">
+                    <kbd>/</kbd>
+                </div>
+                <div class="topbar-actions">
+                    <span class="today-pill">Hoy · <span id="todayLabel"></span></span>
+                    <a class="button button-primary compact" href="{{ url_for('crear_tarea_web') }}"><span>＋</span> Crear tarea</a>
+                </div>
+            </header>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-stack" aria-live="polite">
+                        {% for category, message in messages %}
+                            <div class="flash flash-{{ category }}"><span>✓</span>{{ message }}<button aria-label="Cerrar">×</button></div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

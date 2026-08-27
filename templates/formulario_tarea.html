@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Nueva tarea · TaskFlow{% endblock %}
+
+{% block content %}
+<div class="page form-page">
+    <a class="back-link" href="{{ url_for('index') }}">← Volver a mi día</a>
+    <div class="form-layout">
+        <section class="form-intro">
+            <span class="eyebrow"><span class="pulse-dot"></span> Nueva intención</span>
+            <h1>Convierte una idea<br>en <em>acción.</em></h1>
+            <p>Define qué necesitas lograr. Una tarea clara es el comienzo de un día más ligero.</p>
+            <div class="form-tip"><span>✦</span><div><strong>Un pequeño consejo</strong><p>Empieza el título con un verbo: “Preparar”, “Enviar”, “Revisar”...</p></div></div>
+        </section>
+
+        <section class="form-card">
+            <div class="form-card-heading"><span>01</span><div><h2>Detalles de la tarea</h2><p>Cuéntanos lo necesario para ponerla en marcha.</p></div></div>
+            <form method="post" id="taskForm">
+                <div class="field full-field">
+                    <label for="titulo">¿Qué necesitas hacer?</label>
+                    <input type="text" id="titulo" name="titulo" placeholder="Ej. Preparar presentación del proyecto" maxlength="100" required autofocus>
+                    <small><span id="titleCount">0</span>/100</small>
+                </div>
+                <div class="field full-field">
+                    <label for="descripcion">Notas <span>Opcional</span></label>
+                    <textarea id="descripcion" name="descripcion" rows="5" placeholder="Agrega contexto, pasos o ideas que no quieres olvidar..."></textarea>
+                </div>
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="fecha_limite">Fecha límite</label>
+                        <input type="date" id="fecha_limite" name="fecha_limite">
+                    </div>
+                    <div class="field">
+                        <label for="proyecto_id">Proyecto</label>
+                        <div class="select-wrap">
+                            <select id="proyecto_id" name="proyecto_id" required>
+                                {% for proyecto in proyectos %}
+                                    <option value="{{ proyecto.id }}">{{ proyecto.to_dict().nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <fieldset class="priority-field">
+                    <legend>Prioridad</legend>
+                    <div class="priority-options">
+                        {% for priority, label, hint in [('Baja', 'Baja', 'Puede esperar'), ('Media', 'Media', 'Importante'), ('Alta', 'Alta', 'Es urgente')] %}
+                            <label class="priority-option priority-option-{{ priority|lower }}">
+                                <input type="radio" name="prioridad" value="{{ priority }}" {{ 'checked' if priority == 'Media' }}>
+                                <span><i></i><strong>{{ label }}</strong><small>{{ hint }}</small></span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+                <div class="form-actions">
+                    <a class="button button-ghost" href="{{ url_for('index') }}">Cancelar</a>
+                    <button class="button button-primary button-submit" type="submit">Crear tarea <span>→</span></button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock %}
